@@ -23,9 +23,13 @@ def ocr_and_highlight_pdf(pdf_path, sensitive_words, output_path):
             # 1. Convert Page to Image
             # Use higher DPI for better OCR accuracy
             pix = page.get_pixmap(dpi=300)
-            
+
             # Save to a temporary file because our OCR utils expects a file path
-            temp_img_path = f"temp_page_{page_num}.png"
+            # Use a temp directory in the project folder
+            project_root = os.path.dirname(os.path.abspath(__file__))
+            temp_dir = os.path.join(project_root, "temp")
+            os.makedirs(temp_dir, exist_ok=True)
+            temp_img_path = os.path.join(temp_dir, f"temp_page_{page_num}.png")
             pix.save(temp_img_path)
             
             try:

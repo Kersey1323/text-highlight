@@ -72,7 +72,9 @@ def process_file(file_path):
             print("OCR failed or returned no text.")
 
 def main():
-    target_dir = "/home/gms/text-highlight"
+    # 获取项目根目录（当前脚本所在目录）
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    target_dir = os.path.join(project_root, "data")
     
     # Find all PDFs and Images
     types = ('*.pdf', '*.png', '*.jpg', '*.jpeg')
