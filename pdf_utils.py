@@ -7,7 +7,7 @@ from PIL import Image
 from ocr_utils import get_ocr_text
 from text_renderer import render_text_with_highlights
 from docx import Document
-from docx.shared import Pt, RGBColor
+from docx.shared import Pt, RGBColor, Cm
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.dml import MSO_THEME_COLOR_INDEX
@@ -45,8 +45,10 @@ def parse_markdown_to_docx(text, sensitive_words=None):
 
     # Set default font for normal style
     style = doc.styles['Normal']
-    style.font.name = '仿宋'
-    style._element.rPr.rFonts.set(qn('w:eastAsia'), '仿宋')
+    style.font.name = '仿宋_GB2312'
+    style._element.rPr.rFonts.set(qn('w:eastAsia'), '仿宋_GB2312')
+    style._element.rPr.rFonts.set(qn('w:ascii'), 'Times New Roman')
+    style._element.rPr.rFonts.set(qn('w:hAnsi'), 'Times New Roman')
     style.font.size = Pt(12)
 
     if not sensitive_words:
@@ -70,18 +72,28 @@ def parse_markdown_to_docx(text, sensitive_words=None):
                 p = doc.add_paragraph(heading_text)
                 p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
                 run = p.runs[0]
-                run.font.name = '黑体'
-                run._element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
+                run.font.name = '仿宋_GB2312'
+                run._element.rPr.rFonts.set(qn('w:eastAsia'), '仿宋_GB2312')
+                run._element.rPr.rFonts.set(qn('w:ascii'), 'Times New Roman')
+                run._element.rPr.rFonts.set(qn('w:hAnsi'), 'Times New Roman')
                 run.font.size = Pt(22)
                 run.bold = True
             elif heading_level == 2:
-                # Secondary heading
+                # Secondary heading - 小标题格式
                 p = doc.add_paragraph(heading_text)
                 run = p.runs[0]
-                run.font.name = '黑体'
-                run._element.rPr.rFonts.set(qn('w:eastAsia'), '黑体')
-                run.font.size = Pt(16)
-                run.bold = True
+                # 字体：仿宋，英文Times New Roman
+                run.font.name = '仿宋_GB2312'
+                run._element.rPr.rFonts.set(qn('w:eastAsia'), '仿宋_GB2312')
+                run._element.rPr.rFonts.set(qn('w:ascii'), 'Times New Roman')
+                run._element.rPr.rFonts.set(qn('w:hAnsi'), 'Times New Roman')
+                run.font.size = Pt(12)  # 小四 = 12pt
+                run.font.bold = True  # 加粗
+                # 首行缩进2字符
+                p.paragraph_format.first_line_indent = Cm(0.74)
+                p.paragraph_format.line_spacing = Pt(28)  # 固定值28磅，与正文一致
+                p.paragraph_format.space_before = Pt(0)
+                p.paragraph_format.space_after = Pt(0)
             else:
                 # Other headings
                 p = doc.add_paragraph(heading_text)
@@ -106,11 +118,22 @@ def add_text_with_highlights(paragraph, text, sensitive_words):
         text: text to add
         sensitive_words: list of words to highlight
     """
-    # For now, just add text without highlighting
+    # Add text with formatting
     run = paragraph.add_run(text)
-    run.font.name = '宋体'
-    run._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
-    run.font.size = Pt(12)
+
+    # 字体设置：中文仿宋，英文Times New Roman
+    run.font.name = '仿宋_GB2312'
+    run._element.rPr.rFonts.set(qn('w:eastAsia'), '仿宋_GB2312')
+    run._element.rPr.rFonts.set(qn('w:ascii'), 'Times New Roman')
+    run._element.rPr.rFonts.set(qn('w:hAnsi'), 'Times New Roman')
+    run.font.size = Pt(12)  # 小四 = 12pt
+
+    # 段落格式设置
+    paragraph.paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY  # 两端对齐
+    paragraph.paragraph_format.first_line_indent = Cm(0.74)  # 首行缩进2字符 ≈ 0.74cm
+    paragraph.paragraph_format.line_spacing = Pt(28)  # 固定值28磅
+    paragraph.paragraph_format.space_before = Pt(0)  # 段前0行
+    paragraph.paragraph_format.space_after = Pt(0)  # 段后0行
 
 
 def ocr_and_highlight_pdf_docx(pdf_path, sensitive_words, output_docx_path, output_pdf_path=None):
@@ -151,6 +174,9 @@ def ocr_and_highlight_pdf_docx(pdf_path, sensitive_words, output_docx_path, outp
                     print(f"    Text: {text}")
                     # Remove "识别结果：" prefix if present using regex
                     text = re.sub(r'^识别结果：', '', str(text)).strip()
+                    # Remove markdown code block markers (```markdown and ```)
+                    text = re.sub(r'^```(?:markdown)?\s*', '', text).strip()
+                    text = re.sub(r'\s*```$', '', text).strip()
                     all_text += text + "\n\n"
                 else:
                     print(f"    Warning: No text found on page {page_num + 1}.")
