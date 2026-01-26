@@ -2,8 +2,9 @@ import os
 import requests
 
 # OCR API 服务配置
-OCR_API_URL = "http://localhost:7862/processOCR"
-MODEL_NAME = "deepseek-ocr"
+OCR_API_URL = "http://localhost:80/processVL"
+MODEL_NAME = "qwen3-vl-8b-instruct"
+PROMPT = "请识别这张图片的内容并以markdown的格式给出。"
 
 
 def get_ocr_text(file_path):
@@ -18,7 +19,7 @@ def get_ocr_text(file_path):
         print(f"Running OCR on {os.path.basename(file_path)}...")
 
         # Prepare the request
-        url = f"{OCR_API_URL}?model_name={MODEL_NAME}"
+        url = f"{OCR_API_URL}?model_name={MODEL_NAME}&prompt={PROMPT}"
 
         # Open and send the image file
         with open(file_path, 'rb') as f:
@@ -34,7 +35,7 @@ def get_ocr_text(file_path):
             result = response.json()
 
             if result.get('success') and result.get('data'):
-                ocr_text = result['data'].get('text', '')
+                ocr_text = result['data'].get('response', '')
                 return ocr_text
             else:
                 print(f"OCR API returned error: {result.get('error', 'Unknown error')}")
