@@ -1,0 +1,36 @@
+paths:
+  input_dir: "data"
+  output_dir: "outputs"
+  temp_dir: "temp"
+
+sensitive_words:
+  - "兴业建筑"
+  - "安州旅游"
+  - "中菱钢"
+  - "违约金"
+  - "质保金"
+  - "分包结算书"
+  - "安正兴业"
+  - "中菱钢结构股份有限公司"
+  - "成都安正兴业建筑工程有限公司"
+  - "况熙"
+
+pdf:
+  # Percentage of text characters on page to consider it a text PDF
+  # This is a heuristic: if we can extract decent amount of text, we treat it as text PDF
+  text_density_threshold: 0.05 
+
+highlight:
+  # Adjust the size of the highlight box (for text PDF)
+  # Positive values expand, negative values shrink (units: PDF points)
+  padding_x: 0.0
+  padding_y: -2.0 # Try shrinking height slightly by default
+  # RGB Color (0-1 scale)
+  color: [1, 1, 0] 
+
+ocr:
+  lang: "ch_sim"
+  dpi: 300
+  api_url: "http://localhost:7863/processVL"
+  model_name: "qwen3-vl-8b-instruct"
+  prompt: "请识别这张图片的内容并以markdown的格式给出。对于居中或右对齐的文本（如页码、日期等），请分别使用 <center>文本</center> 或 <right>文本</right> 标记包裹。"
