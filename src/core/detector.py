@@ -22,19 +22,11 @@ class PDFTypeDetector:
             # Check first few pages (up to 3)
             pages_to_check = min(len(doc), 3)
             total_text_len = 0
-            total_area = 0
             
             for i in range(pages_to_check):
                 page = doc[i]
-                text = page.get_text()
-                total_text_len += len(text.strip())
-                # Calculate approximate page area (in points^2)
-                # This isn't a perfect density metric but a heuristic
-                # A full page of text usually has > 500 characters
+                total_text_len += len(page.get_text().strip())
                 
-            # Heuristic: If we have > 50 chars per page on average, it's likely text
-            # Or use the threshold from config if we wanted to be more precise about density
-            
             avg_text_per_page = total_text_len / pages_to_check
             
             print(f"[Detector] Average text length per page: {avg_text_per_page}")
@@ -47,7 +39,39 @@ class PDFTypeDetector:
         except Exception as e:
             print(f"Error detecting PDF type: {e}")
             return False
+
+    @staticmethod
+    def is_page_text_based(page, threshold=50):
+        """
+        Determines if a single PDF page is text-based.
+        Returns False if it's a scanned page (even if it has hidden text/OCR).
+        
+        Args:
+            page (fitz.Page): The page object.
+            threshold (int): Minimum characters to consider as text page.
+            
+        Returns:
+            bool: True if text-based (native), False if scanned/image-based.
+        """
+        try:
+            text = page.get_text()
+            text_len = len(text.strip())
+            
+            # Prioritize text existence/searchability.
+            # If the page has a significant amount of text (e.g., > 100 chars), 
+            # we assume it is "Text-based" (searchable/highlightable).
+            # We ignore image coverage because many PDFs are "Searchable Images" 
+            # (scans with an invisible text layer) which the user treats as text.
+            # Note: We use 100 chars to filter out pages with just a few garbage OCR characters
+            # (e.g. Page 1 of the sample has 86 chars of garbage).
+            if text_len > 100:
+                return True
+                
+            return False
+            
+        except:
+            return False
         
 # if __name__ == "__main__":
 #     detector = PDFTypeDetector()
-#     print(detector.is_text_pdf(f"C:\\Users\\49270\\Desktop\\internal\\text-highlight\\data\\scan.pdf"))
+#     print(detector.is_text_pdf(f"C:\\Users\\49270\\Desktop\\internal\\text-highlight\\data\\中菱钢诉兴业建筑、安州旅游起诉状.pdf"))

@@ -14,7 +14,8 @@ sensitive_words:
   - "中菱钢结构股份有限公司"
   - "成都安正兴业建筑工程有限公司"
   - "况熙"
-
+  - "绵阳市安州区千佛山片区产业提升建设项目"
+  - "中浩宇项目管理有限公司"
 pdf:
   # Percentage of text characters on page to consider it a text PDF
   # This is a heuristic: if we can extract decent amount of text, we treat it as text PDF

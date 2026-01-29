@@ -13,7 +13,7 @@ def test_pipeline():
     # Test cases
     files = [
         "text.pdf", # Text PDF
-        "scan.pdf", # Scanned PDF
+        "中菱钢诉兴业建筑、安州旅游起诉状.pdf", # Scanned PDF
         "答辩状.PNG" # Image
     ]
     

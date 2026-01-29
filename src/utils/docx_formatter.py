@@ -88,6 +88,17 @@ def parse_markdown_to_docx(text, sensitive_words=None, doc=None):
     """
     if doc is None:
         doc = Document()
+        
+        # Set margins to be slightly narrower to accommodate "Official Document" spacing
+        # Standard Word margins are ~2.54cm or 3.17cm. We'll reduce to ~2.0cm.
+        try:
+            section = doc.sections[0]
+            section.top_margin = Cm(1.8)
+            section.bottom_margin = Cm(1.8)
+            section.left_margin = Cm(2.2)
+            section.right_margin = Cm(2.2)
+        except:
+            pass
 
         # Set default font for normal style
         style = doc.styles['Normal']

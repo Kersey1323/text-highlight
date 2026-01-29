@@ -2,6 +2,7 @@ import os
 import yaml
 from ..processors.pdf_text import TextPDFHighlighter
 from ..processors.pdf_scan import ScannedPDFHighlighter
+from ..processors.pdf_hybrid import HybridPDFHighlighter
 from ..processors.image import ImageHighlighter
 from .detector import PDFTypeDetector
 
@@ -18,6 +19,7 @@ class Pipeline:
         self.processors = {
             'pdf_text': TextPDFHighlighter(),
             'pdf_scan': ScannedPDFHighlighter(),
+            'pdf_hybrid': HybridPDFHighlighter(),
             'image': ImageHighlighter()
         }
 
@@ -56,13 +58,10 @@ class Pipeline:
         processor = None
         
         if ext == '.pdf':
-            is_text = self.detector.is_text_pdf(input_path)
-            if is_text:
-                print("Detected Text PDF")
-                processor = self.processors['pdf_text']
-            else:
-                print("Detected Scanned PDF")
-                processor = self.processors['pdf_scan']
+            # Always use Hybrid processor for PDFs to handle mixed content correctly.
+            # It checks page-by-page whether to use Text highlighting or OCR.
+            print("Using Hybrid Processor for PDF.")
+            processor = self.processors['pdf_hybrid']
         elif ext in ['.png', '.jpg', '.jpeg', '.bmp', '.tiff']:
             print("Detected Image")
             processor = self.processors['image']
