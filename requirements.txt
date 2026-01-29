@@ -2,7 +2,4 @@ pymupdf
 requests
 Pillow
 opencv-python
-torch
-torchvision
-transformers
-sentencepiece
+python-docx

@@ -106,16 +106,13 @@ def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(current_dir)
 
-    input_pdf = os.path.join(project_root, "data", "附件4 研究生学校奖学金申请审批表.pdf")
+    input_pdf = os.path.join(project_root, "outputs", "民事起诉状_从docx转换.pdf")
     output_pdf = os.path.join(project_root, "outputs", "文本型PDF高亮示例.pdf")
 
     # 定义要高亮的敏感词
     sensitive_words = [
-        "况熙",
-        "性别",
-        "出生年月",
-        "政治面貌",
-        "申请人签名",
+        "中菱钢结构股份有限公司",
+        "成都安正兴业建筑工程有限公司",
 
     ]
 

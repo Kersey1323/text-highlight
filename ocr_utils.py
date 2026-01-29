@@ -2,7 +2,7 @@ import os
 import requests
 
 # OCR API 服务配置
-OCR_API_URL = "http://localhost:80/processVL"
+OCR_API_URL = "http://localhost:7862/processVL"
 MODEL_NAME = "qwen3-vl-8b-instruct"
 PROMPT = "请识别这张图片的内容并以markdown的格式给出。"
 
